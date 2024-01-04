@@ -84,7 +84,7 @@ namespace Admin.UI.Controllers
             return NotFound();
         }
 
-        public async Task<IActionResult> StateToUpdate(int stateid)
+        public async Task<ActionResult> StateToUpdate(int stateid)
         {
             try
             {
@@ -109,7 +109,7 @@ namespace Admin.UI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> StateUpdate([FromRoute] int stateid, [FromForm] StateDto updatedStateDto)
+        public async Task<ActionResult> StateUpdate([FromRoute] int stateid, [FromForm] StateDto updatedStateDto)
         {
             try
             { 

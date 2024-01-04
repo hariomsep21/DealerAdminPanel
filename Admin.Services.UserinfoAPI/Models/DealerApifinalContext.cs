@@ -32,6 +32,7 @@ public partial class DealerApifinalContext : DbContext
            
             entity.Property(e => e.Phone).HasDefaultValue("");
             entity.Property(e => e.Sid).HasColumnName("SId");
+         
         });
 
         OnModelCreatingPartial(modelBuilder);

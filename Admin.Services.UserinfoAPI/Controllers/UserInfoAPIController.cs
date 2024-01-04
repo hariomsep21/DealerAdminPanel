@@ -44,6 +44,66 @@ namespace Admin.Services.UserinfoAPI.Controllers
                 return new StatusCodeResult(500);
             }
         }
+
+
+
+        [HttpDelete("Delete/{id}")]
+        public async Task<ActionResult> DeleteState(int id)
+        {
+            try
+            {
+                var deletedState = await _userService.DeleteUserAsync(id);
+
+                if (deletedState != null)
+                {
+                    // Optionally, you can return information about the deleted state
+                    return Ok(new { Message = "State deleted successfully", DeletedState = deletedState });
+                }
+                else
+                {
+                    // Handle the case where the state was not found
+                    return NotFound(new { Message = "State not found" });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
+        }
+
+
+        [HttpPut("UpdateId{id}")]
+        public async Task<ActionResult<UsersDto>> UpdateState(int id, [FromBody] UsersDto updatedStateDto)
+        {
+            try
+            {
+                var result = await _userService.UpdateUserAsync(id, updatedStateDto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
+        }
+
+        
+
+        [HttpGet("GetUserById{id}")]
+        public async Task<ActionResult<UsersDto>> GetStateiId(int id)
+        {
+            try
+            {
+                var result = await _userService.GetUserByIdAsync(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal Server Error: {ex.Message}");
+            }
+        }
     }
 }
 
