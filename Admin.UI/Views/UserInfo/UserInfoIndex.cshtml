@@ -30,6 +30,14 @@
                     <th>
                         User Phone
                     </th>
+                    <th>
+                        Active
+                        </
+                    </th>
+                    <th>
+                        Rejected
+                        </
+                    </th>
                     <th></th>
                 </tr>
             </thead>
@@ -50,6 +58,27 @@
                             }
                         </td>
                         <td>@item.Phone</td>
+                        <td>
+                            @if (item.Active)
+                            {
+                                <span>Activated</span>
+                            }
+                            else
+                            {
+                                <span>Deactivated</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.Rejected)
+                            {
+                                <span>Rejected</span>
+                            }
+                            else
+                            {
+                                <span>Not Rejected</span>
+                            }
+                        </td>
+
                         <td>
                             <a asp-action="UserToUpdate" asp-route-userid="@item.Id" class="btn btn-primary">
                                 <i class="bi bi-pencil"></i>
