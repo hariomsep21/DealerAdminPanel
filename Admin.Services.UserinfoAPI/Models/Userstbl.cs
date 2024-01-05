@@ -14,4 +14,7 @@ public partial class Userstbl
     public int? Sid { get; set; }
     public string Phone { get; set; } = null!;
 
+    public bool Active { get; set; }
+    public bool Rejected { get; set; }
+
 }

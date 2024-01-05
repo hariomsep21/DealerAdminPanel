@@ -1,11 +1,15 @@
-﻿namespace Admin.Services.CarService.BuisnessLayer
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace Admin.Services.CarService.BuisnessLayer
 {
     public interface ICarServices
     {
-        Task<string> AddCar(CarDto car);
-        Task<IEnumerable<CarDto>> GetAllCars();
-        Task<CarDto> GetCarById(int id);
-        Task<bool> DeleteCar(int id);
-        Task<bool> UpdateCar(int id, CarDto updatedCar);
+      
+
+        Task<IEnumerable<CarDto>> GetCarDetailsAsync();
+        Task<CarDto> AddCarAsync(CarDto newStateDto);
+        Task<IActionResult> DeleteCarAsync(int id);
+        Task<CarDto> UpdateCarAsync(int id, CarDto updatedCarDto);
+        Task<CarDto> GetCarByIdAsync(int id);
     }
 }

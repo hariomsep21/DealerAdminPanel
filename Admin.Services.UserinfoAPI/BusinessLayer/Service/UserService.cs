@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Admin.Services.UserinfoAPI.BusinessLayer.Service
 {
-    
+
     public class UserService : IUserService
     {
         private readonly DealerApifinalContext _db;
@@ -113,12 +113,20 @@ namespace Admin.Services.UserinfoAPI.BusinessLayer.Service
                     return null;
                 }
 
+                // Check if both Active and Rejected flags are true in the updated data
+                if (updatedStateDto.Active && updatedStateDto.Rejected)
+                {
+                    throw new InvalidOperationException("Please select only one option: Active or Rejected.");
+                }
+
                 // Use AutoMapper to update the existing state with the DTO data
                 _mapper.Map(updatedStateDto, existingState);
 
-                // Update the state in the database
+                // Update the state in the database only if there are changes
+
                 _db.Userstbls.Update(existingState);
                 await _db.SaveChangesAsync();
+
 
                 // Map the updated entity back to DTO
                 var updatedStateDtoResult = _mapper.Map<UsersDto>(existingState);

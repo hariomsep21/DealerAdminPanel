@@ -15,13 +15,13 @@ namespace Admin.Services.StateAPI.Business_layer.Service
     {
         private readonly DealerApifinalContext _db;
         private readonly IMapper _mapper;
-        private ResponseDto _response;
+   
 
         public StateService(DealerApifinalContext db, IMapper mapper)
         {
             _db = db;
             _mapper = mapper;
-            _response = new ResponseDto();
+           
         }
 
         public async Task<IEnumerable<StatetDto>> GetStateDetailsAsync()

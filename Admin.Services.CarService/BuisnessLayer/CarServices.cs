@@ -1,5 +1,6 @@
 ﻿using Admin.Services.CarService.DataLayer.Models;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Admin.Services.CarService.BuisnessLayer
@@ -16,124 +17,145 @@ namespace Admin.Services.CarService.BuisnessLayer
         }
 
 
-        public async Task<string> AddCar(CarDto car)
+        public async Task<IEnumerable<CarDto>> GetCarDetailsAsync()
         {
             try
             {
-                if (car == null)
+                var statedetails = await finalContext.Cars.ToListAsync();
+
+                if (statedetails == null || statedetails.Count == 0)
                 {
-                    return "Invalid car data";
+                    // Return an empty collection if no data is found
+                    return new List<CarDto>();
                 }
 
-                var newCar = _mapper.Map<Car>(car);
-                finalContext.Cars.Add(newCar);
+                // Use AutoMapper to map the entities to DTO
+                var statesDto = _mapper.Map<IEnumerable<CarDto>>(statedetails);
+
+                return statesDto;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                throw new Exception("Error in GetStateDetailsAsync", ex);
+            }
+        }
+
+        public async Task<CarDto> AddCarAsync(CarDto newStateDto)
+        {
+            try
+            {
+                // Check if the ModelState is valid
+                if (newStateDto == null)
+                {
+                    throw new ArgumentException("Invalid ModelState");
+                }
+
+                // Use AutoMapper to map the DTO to the entity
+                var newState = _mapper.Map<Car>(newStateDto);
+
+                // Add the new state to the database
+                finalContext.Cars.Add(newState);
                 await finalContext.SaveChangesAsync();
 
-                return "Car added successfully";
+                // Map the added entity back to DTO
+                var addedStateDto = _mapper.Map<CarDto>(newState);
+
+                return addedStateDto;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return "Error adding car to the database";
+                // Log the exception or handle it as appropriate for your application
+                throw new Exception("Error in AddStateAsync", ex);
             }
         }
 
-
-
-        public async Task<IEnumerable<CarDto>> GetAllCars()
+        public async Task<IActionResult> DeleteCarAsync(int id)
         {
             try
             {
-                var cars = await finalContext.Cars.ToListAsync();
+                // Find the state in the database by id
+                var stateToDelete = await finalContext.Cars.FindAsync(id);
 
-                if (cars != null)
+                // Return 404 Not Found if the state is not found
+                if (stateToDelete == null)
                 {
-                    var Allcars = _mapper.Map<IEnumerable<CarDto>>(cars);
-                    return Allcars;
+                    return new NotFoundResult();
                 }
-                else
-                {
 
+                // Remove the state from the database
+                finalContext.Cars.Remove(stateToDelete);
+                await finalContext.SaveChangesAsync();
+
+                // Return 204 No Content indicating successful deletion
+                return new NoContentResult();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                throw new Exception("Error in DeleteStateAsync", ex);
+            }
+        }
+
+        public async Task<CarDto> GetCarByIdAsync(int id)
+        {
+            try
+            {
+                var getState = await finalContext.Cars.FindAsync(id);
+
+                if (getState == null)
+                {
+                    // Return null if no data is found
                     return null;
                 }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
 
+                // Use AutoMapper to map the entity to DTO
+                var showState = _mapper.Map<CarDto>(getState);
 
-        public async Task<CarDto> GetCarById(int id)
-        {
-            try
-            {
-                var carsdetails = await finalContext.Cars.FindAsync(id);
-                if (carsdetails != null)
-                {
-                    var car = _mapper.Map<CarDto>(carsdetails);
-                    return car;
-                }
-
-                Console.WriteLine("Not found");
-                return null;
+                return showState;
             }
             catch (Exception ex)
             {
-                // Log or handle exceptions as needed
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return null;
-            }
-        }
-        public async Task<bool> UpdateCar(int id, CarDto updatedCar)
-        {
-            try
-            {
-                var existingCar = await finalContext.Cars.FindAsync(id);
-
-                if (existingCar != null)
-                {
-                    _mapper.Map(updatedCar, existingCar);
-
-                    finalContext.Cars.Update(existingCar);
-                    await finalContext.SaveChangesAsync();
-
-                    return true; // Successfully updated
-                }
-                else
-                {
-                    return false; // Car not found for update
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log or handle exceptions as needed
-                Console.WriteLine($"An error occurred during update: {ex.Message}");
-                return false;
+                // Log the exception or handle it as appropriate for your application
+                throw new Exception("Error in GetStateByIdAsync", ex);
             }
         }
 
-        public async Task<bool> DeleteCar(int id)
+        public async Task<CarDto> UpdateCarAsync(int id, CarDto updatedCarDto)
         {
             try
             {
-                var carToDelete = await finalContext.Cars.FindAsync(id);
+                // Check if the ModelState is valid
+                if (updatedCarDto == null)
+                {
+                    throw new ArgumentException("Invalid ModelState");
+                }
 
-                if (carToDelete != null)
+                // Find the state in the database by id
+                var existingState = await finalContext.Cars.FindAsync(id);
+
+                // Return null if the state is not found
+                if (existingState == null)
                 {
-                    finalContext.Cars.Remove(carToDelete);
-                    await finalContext.SaveChangesAsync();
-                    return true; // Successfully deleted
+                    return null;
                 }
-                else
-                {
-                    return false; // Car not found for deletion
-                }
+
+                // Use AutoMapper to update the existing state with the DTO data
+                _mapper.Map(updatedCarDto, existingState);
+
+                // Update the state in the database
+                finalContext.Cars.Update(existingState);
+                await finalContext.SaveChangesAsync();
+
+                // Map the updated entity back to DTO
+                var updatedStateDtoResult = _mapper.Map<CarDto>(existingState);
+
+                return updatedStateDtoResult;
             }
             catch (Exception ex)
             {
-                // Log or handle exceptions as needed
-                Console.WriteLine($"An error occurred during deletion: {ex.Message}");
-                return false;
+                // Log the exception or handle it as appropriate for your application
+                throw new Exception("Error in UpdateStateAsync", ex);
             }
         }
 

@@ -1,5 +1,17 @@
 ﻿@model UserInfoDto;
+<style>
+  
+    .custom-checkbox {
+        width: 24px;
+        height: 24px;
+       
+    }
 
+   
+    .custom-checkbox:checked {
+        background-color: green;
+    }
+</style>
 <form asp-action="UserUpdate" method="post">
     <br />
     <div class="container border p-3">
@@ -43,6 +55,24 @@
                 <input asp-for="Phone" class="form-control" />
                 <span asp-validation-for="Phone" class="text-danger"></span>
             </div>
+
+
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Active</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Active" id="Active" type="checkbox" class="form-check-input custom-checkbox" />
+            </div>
+            <div class="col-2">
+                <label class="control-label pt-2" style="font-size:20px;">Rejected</label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Rejected" id="Rejected" type="checkbox" class="form-check-input custom-checkbox" />
+            </div>
+
+
+
+
             <div class="col-5 offset-2">
                 <a asp-action="UserInfoIndex" class="btn-primary btn form-control ">Back to List</a>
             </div>
@@ -53,6 +83,7 @@
         <div></div>
     </div>
 </form>
+
 
 @section Scripts
 {

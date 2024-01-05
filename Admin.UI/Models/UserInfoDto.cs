@@ -12,6 +12,8 @@
 
         public string Phone { get; set; } = null!;
 
+        public bool Active { get; set; }
+        public bool Rejected { get; set; }
 
     }
 }

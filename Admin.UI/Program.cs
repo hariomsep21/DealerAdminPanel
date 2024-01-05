@@ -13,7 +13,7 @@ ApiTypeSD.UserInfoAPIBase = builder.Configuration["ServicerUrls:UserinfoAPIBase"
 ApiTypeSD.StateAPIBase = builder.Configuration["ServicerUrls:StateAPI"];
 
 
-
+builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IUserInfoService, UserInfoService>();
 builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddScoped<IBaseService, BaseService>();

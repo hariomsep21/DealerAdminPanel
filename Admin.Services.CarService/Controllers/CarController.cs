@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CarService.Controllers
 {
-    public class CarController:ControllerBase
+    [Route("api/[Controller]")]
+    [ApiController]
+    public class CarController : ControllerBase
     {
 
         private readonly ICarServices _carservice;
@@ -13,95 +15,90 @@ namespace CarService.Controllers
             _carservice = carservice;
         }
 
-
+        [HttpGet("GetAllCar")]
+        public async Task<ActionResult<IEnumerable<CarDto>>> GetCarDetails()
+        {
+            try
+            {
+                var result = await _carservice.GetCarDetailsAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
+        }
 
         [HttpPost("AddCar")]
-        public async Task<IActionResult> AddCar([FromBody] CarDto car)
+        public async Task<ActionResult<CarDto>> AddCar([FromBody] CarDto newStateDto)
         {
-            var result = await _carservice.AddCar(car);
+            try
+            {
+                var result = await _carservice.AddCarAsync(newStateDto);
+                return CreatedAtAction(nameof(GetCarDetails), new { id = result.CarId }, result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
+        }
 
-            if (result.Equals("Car added successfully"))
+        [HttpDelete("Delete/{id}")]
+        public async Task<ActionResult> DeleteCar(int id)
+        {
+            try
             {
-                return Ok(result); // Return 200 OK status
+                var deletedState = await _carservice.DeleteCarAsync(id);
+
+                if (deletedState != null)
+                {
+                    // Optionally, you can return information about the deleted state
+                    return Ok(new { Message = "State deleted successfully", DeletedState = deletedState });
+                }
+                else
+                {
+                    // Handle the case where the state was not found
+                    return NotFound(new { Message = "car not found" });
+                }
             }
-            else if (result.Equals("Invalid car data"))
+            catch (Exception ex)
             {
-                return BadRequest(result); // Return 400 Bad Request status
-            }
-            else
-            {
-                return StatusCode(500, result); // Return 500 Internal Server Error status
+                // Log the exception or handle it as appropriate for your application
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
         }
 
 
-
-        [HttpGet("GetAllCars")]
-        public async Task<IActionResult> GetAllCars()
+        [HttpPut("Update{id}")]
+        public async Task<ActionResult<CarDto>> UpdateCar(int id, [FromBody] CarDto updatedCarDto)
         {
-            var cars = await _carservice.GetAllCars();
-            if (cars != null)
+            try
             {
-                return Ok(cars); // Return list of CarDto objects with 200 OK status
+                var result = await _carservice.UpdateCarAsync(id, updatedCarDto);
+                return Ok(result);
             }
-            else
+            catch (Exception ex)
             {
-                return StatusCode(500, "Failed to retrieve cars"); // Return 500 Internal Server Error status
+                // Log the exception or handle it as appropriate for your application
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
             }
         }
 
-
-
-
-        [HttpGet("GetCarById")]
-        public async Task<IActionResult> GetCarById(int id)
-        { 
-            var cars = await _carservice.GetCarById(id);
-            if (cars != null)
-            {
-                return Ok(cars); // Return list of CarDto objects with 200 OK status
-            }   
-        else
-            {
-                return StatusCode(500, "Failed to retrieve cars"); // Return 500 Internal Server Error status
-            }
-        }
-
-
-
-        [HttpPut("UpdateCar")]
-        public async Task<IActionResult> UpdateCar(int id, [FromBody]CarDto updatedCar)
+        [HttpGet("GetCarById{id}")]
+        public async Task<ActionResult<CarDto>> GetCariId(int id)
         {
-            var result = await _carservice.UpdateCar(id,updatedCar);
-            if (result)
+            try
             {
-                return Ok("Car updated successfully");
+                var result = await _carservice.GetCarByIdAsync(id);
+                return Ok(result);
             }
-            else
+            catch (Exception ex)
             {
-                return NotFound("Car not found for update");
-            }
-        }
-
-
-
-        [HttpDelete("DeleteCar/{id}")]
-        public async Task<IActionResult> DeleteCar(int id)
-        {
-            var result = await _carservice.DeleteCar(id);
-            if (result)
-            {
-                return Ok("Car deleted successfully");
-            }
-            else
-            {
-                return NotFound("Car not found for deletion");
+                // Log the exception or handle it as appropriate for your application
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal Server Error: {ex.Message}");
             }
         }
     }
-
-
-
-
-    }
-
+}
