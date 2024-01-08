@@ -23,6 +23,23 @@ namespace AdminService.Controllers
             _adminService = adminService;
         }
 
+       
+
+        [HttpGet("register")]
+        public async Task<ActionResult<IEnumerable<AdminDto>>> GetCarDetails()
+        {
+            try
+            {
+                var result = await _adminService.GetAdminDetailsAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error");
+            }
+        }
+
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAdmin([FromBody] AdminDto adminDTO)
         {

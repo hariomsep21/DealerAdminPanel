@@ -1,6 +1,7 @@
 ﻿using Admin.UI.Models;
 using Admin.UI.Service.IService;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 public class UserInfoController : Controller
 {
@@ -77,14 +78,35 @@ public class UserInfoController : Controller
             ViewBag.StatesCount = ViewBag.States.Count;
 
             var existingState = await _userInfoService.GetUserByIdAsync(userid);
-
             if (existingState != null)
             {
-                return View("UserUpdate", existingState); // Pass existing state to the view
+                var associatedUser = states.FirstOrDefault(u => u.StateId == existingState.Sid);
+
+                // Create a list to hold SelectListItem objects
+                var selectListItems = new List<SelectListItem>();
+
+                foreach (var user in states)
+                {
+                    // Create SelectListItem for each user and set the selected property
+                    var item = new SelectListItem
+                    {
+                        Value = user.StateId.ToString(),
+                        Text = user.StateName,
+                        Selected = (associatedUser != null && user.StateId == associatedUser.StateId)
+                    };
+                    selectListItems.Add(item);
+                }
+
+                // Create SelectList from the list of SelectListItem objects
+                SelectList userList = new SelectList(selectListItems, "Value", "Text");
+
+                ViewBag.UsersDropdown = userList;
+
+                return View("UserUpdate", existingState); // Pass existing car details to the view
             }
             else
             {
-                ModelState.AddModelError(string.Empty, $"State with ID {userid} not found");
+                ModelState.AddModelError(string.Empty, $"Car with ID {userid} not found");
                 return RedirectToAction(nameof(UserInfoIndex));
             }
         }

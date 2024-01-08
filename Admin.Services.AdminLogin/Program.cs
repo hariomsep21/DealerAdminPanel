@@ -13,6 +13,8 @@ builder.Services.AddDbContext<DealerApifinalContext>(option =>
 {
     option.UseSqlServer(builder.Configuration.GetConnectionString("conn"));
 });
+// AutoMapper Config
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IAdminServices, AdminServices>();
 // Add services to the container.
 

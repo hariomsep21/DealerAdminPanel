@@ -1,6 +1,7 @@
 ﻿using Admin.UI.Models;
 using Admin.UI.Service.IService;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Admin.UI.Controllers
 {
@@ -29,12 +30,15 @@ namespace Admin.UI.Controllers
                     var states = await _userInfoService.GetUserDetailsAsync();
                     ViewBag.States = states ?? new List<UserInfoDto>(); // Null check
                     ViewBag.StatesCount = result.Count();
-
+                    TempData["successMessage"] = "Car Profile Update successful.";
                     return View(result);
+                    
                 }
 
                 // Handle the case where result is null, e.g., return an empty view or show an error message
+                TempData["successMessage"] = "Car Profile Update successful.";
                 return View(new List<UserInfoDto>());
+               
             }
             catch (HttpRequestException ex)
             {
@@ -65,7 +69,10 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Car Create successful.";
+
                     return RedirectToAction(nameof(CarIndex));
+                    
                 }
             }
             return View(model);
@@ -80,19 +87,19 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Car Delete successful.";
                     return RedirectToAction(nameof(CarIndex));
                 }
                 else
                 {
-                    // Handle 404 Not Found
-                    ModelState.AddModelError(string.Empty, "The requested state was not found.");
+                    TempData["dangerMessage"] = "failed. Please try again.";
                     return RedirectToAction(nameof(CarIndex));
                 }
             }
             return BadRequest(ModelState);
         }
 
-        public async Task<ActionResult> CarToUpdate(int userid)
+        public async Task<ActionResult> CarToUpdate(int Carid)
         {
             try
             {
@@ -100,21 +107,37 @@ namespace Admin.UI.Controllers
                 ViewBag.States = states ?? new List<UserInfoDto>(); // Null check
                 ViewBag.StatesCount = ViewBag.States.Count;
 
-                var existingState = await _carService.GetCarByIdAsync(userid);
+                var existingCar = await _carService.GetCarByIdAsync(Carid);
 
-
-                var StoreUser = existingState.UserId;
-                ViewBag.StoreUser = StoreUser;
-
-
-
-                if (existingState != null)
+                if (existingCar != null)
                 {
-                    return View("UpdateCar", existingState); // Pass existing state to the view
+                    var associatedUser = states.FirstOrDefault(u => u.Id == existingCar.UserId);
+
+                    // Create a list to hold SelectListItem objects
+                    var selectListItems = new List<SelectListItem>();
+
+                    foreach (var user in states)
+                    {
+                        // Create SelectListItem for each user and set the selected property
+                        var item = new SelectListItem
+                        {
+                            Value = user.Id.ToString(),
+                            Text = user.UserName,
+                            Selected = (associatedUser != null && user.Id == associatedUser.Id)
+                        };
+                        selectListItems.Add(item);
+                    }
+
+                    // Create SelectList from the list of SelectListItem objects
+                    SelectList userList = new SelectList(selectListItems, "Value", "Text");
+
+                    ViewBag.UsersDropdown = userList;
+
+                    return View("UpdateCar", existingCar); // Pass existing car details to the view
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, $"State with ID {userid} not found");
+                    ModelState.AddModelError(string.Empty, $"Car with ID {Carid} not found");
                     return RedirectToAction(nameof(CarIndex));
                 }
             }
@@ -125,6 +148,7 @@ namespace Admin.UI.Controllers
                 return RedirectToAction(nameof(CarIndex));
             }
         }
+
 
         [HttpPost]
         public async Task<ActionResult> UpdateCar(int id, CarDto updatedCarDto)
