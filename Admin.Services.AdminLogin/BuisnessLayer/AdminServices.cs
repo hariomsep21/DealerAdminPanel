@@ -7,45 +7,57 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-
+using AutoMapper;
 
 namespace AdminService.BuisnessLayer
 {
     public class AdminServices:IAdminServices
     {
 
+        private readonly IMapper _mapper;
         private readonly DealerApifinalContext _context;
         private readonly IConfiguration _config;
 
-        public AdminServices(DealerApifinalContext dealerApifinalContext, IConfiguration configuration)
+        public AdminServices(DealerApifinalContext dealerApifinalContext, IConfiguration configuration, IMapper mapper)
         {
             _context = dealerApifinalContext;
             _config = configuration;
+            _mapper = mapper;
         }
 
         public async Task<IActionResult> RegisterAdmin(AdminDto adminDTO)
         {
             try
             {
-                CreatePasswordHash(adminDTO.Password, out byte[] passwordHash, out byte[] passwordSalt);
-
-                var admin = new AdminTable
+                var checkUser = _context.AdminTables.FirstOrDefault(t => t.UserName == adminDTO.UserName);
+                if (checkUser == null)
                 {
-                    UserName = adminDTO.UserName,
-                    PasswordHast = passwordHash,
-                    PasswordSalt = passwordSalt
-                };
+                    CreatePasswordHash(adminDTO.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-                _context.AdminTables.Add(admin);
-                await _context.SaveChangesAsync();
+                    var admin = new AdminTable
+                    {
+                        UserName = adminDTO.UserName,
+                        PasswordHast = passwordHash,
+                        PasswordSalt = passwordSalt
+                    };
 
-                return new CreatedAtActionResult(nameof(RegisterAdmin), "Admin", new { id = admin.Id }, admin);
+                    _context.AdminTables.Add(admin);
+                    await _context.SaveChangesAsync();
+
+                    return new CreatedAtActionResult(nameof(RegisterAdmin), "Admin", new { id = admin.Id }, admin);
+                }
+                else
+                {
+                    return new StatusCodeResult(500);
+                }
+
             }
-            catch (DbUpdateException )
+
+            catch (DbUpdateException)
             {
                 return new StatusCodeResult(500); // Consider returning a specific error message
             }
-            catch (Exception )
+            catch (Exception)
             {
                 return new StatusCodeResult(500); // Consider returning a specific error message
             }
@@ -115,6 +127,30 @@ namespace AdminService.BuisnessLayer
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task<IEnumerable<AdminDto>> GetAdminDetailsAsync()
+        {
+            try
+            {
+                var statedetails = await _context.AdminTables.ToListAsync();
+
+                if (statedetails == null || statedetails.Count == 0)
+                {
+                    // Return an empty collection if no data is found
+                    return new List<AdminDto>();
+                }
+
+                // Use AutoMapper to map the entities to DTO
+                var statesDto = _mapper.Map<IEnumerable<AdminDto>>(statedetails);
+
+                return statesDto;
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                throw new Exception("Error in GetStateDetailsAsync", ex);
+            }
         }
     }
 }

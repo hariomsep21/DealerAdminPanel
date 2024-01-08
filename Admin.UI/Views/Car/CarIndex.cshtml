@@ -18,6 +18,7 @@
             </div>
             <div class="col-6 text-end">
                 <a asp-action="CarCreate" class="btn btn-outline-primary"><i class="bi bi-plus-square"></i> Create New Car</a>
+
             </div>
 
         </div>
@@ -59,7 +60,8 @@
                         </td>
 
                         <td>
-                            <a asp-action="CarToUpdate" asp-route-userid="@item.CarId" class="btn btn-primary">
+                            <a asp-action="CarToUpdate" asp-route-Carid="@item.CarId" class="btn btn-primary">
+
                                 <i class="bi bi-pencil"></i>
                             </a>
                             <a asp-action="CarDelete" asp-route-carId="@item.CarId" class="btn btn-danger">

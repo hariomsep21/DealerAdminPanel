@@ -40,10 +40,10 @@
                 <span asp-validation-for="UserEmail" class="text-danger"></span>
             </div>
             <div class="col-2">
-                <label class="control-label pt-2" style="font-size:20px;">User StateId</label>
+                <label class="control-label pt-2" style="font-size:20px;">User State</label>
             </div>
             <div class="col-10 pb-3">
-                <input asp-for="Sid" class="form-control" type="number" min="1" max="@ViewBag.StatesCount" />
+                @Html.DropDownListFor(model => model.Sid, ViewBag.UsersDropdown as SelectList, new { @class = "form-control" })
                 <span asp-validation-for="Sid" class="text-danger"></span>
             </div>
 
