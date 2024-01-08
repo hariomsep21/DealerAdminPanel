@@ -57,10 +57,30 @@ namespace Admin.UI.Controllers
 
         public async Task<ActionResult> CarCreate()
         {
-            return View();
+            try
+            {
+                var users = await _userInfoService.GetUserDetailsAsync(); // Fetch all users from your service
+
+                var userList = users.Select(u => new SelectListItem
+                {
+                    Value = u.Id.ToString(),
+                    Text = u.UserName
+                }).ToList();
+
+                ViewBag.UsersDropdown = new SelectList(userList, "Value", "Text"); // Create the SelectList
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                ModelState.AddModelError(string.Empty, "Internal Server Error");
+                return RedirectToAction(nameof(CarIndex));
+            }
         }
 
         [HttpPost]
+
         public async Task<ActionResult> CarCreate(CarDto model)
         {
             if (ModelState.IsValid)
@@ -69,14 +89,13 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
-                    TempData["successMessage"] = "Car Create successful.";
-
                     return RedirectToAction(nameof(CarIndex));
-                    
                 }
             }
+
             return View(model);
         }
+
 
 
         public async Task<ActionResult> CarDelete(int carId)

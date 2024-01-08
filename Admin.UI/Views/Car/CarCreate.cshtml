@@ -52,5 +52,9 @@
 
 @section Scripts
 {
+        function toggleDropdown() {
+            var dropdown = document.getElementById("userDropdown");
+            dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+        }
     <partial name="_ValidationScriptsPartial" />
 }
