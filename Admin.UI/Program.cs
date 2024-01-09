@@ -17,6 +17,15 @@ builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<IUserInfoService, UserInfoService>();
 builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddScoped<IBaseService, BaseService>();
+builder.Services.AddScoped<IAggregatorsService, AggregatorsService>();
+builder.Services.AddScoped<IPvOpenMarketsService, PvOpenMarketsService>();
+builder.Services.AddScoped<IPvNewCarDealersService, PvNewCarDealersService>();
+builder.Services.AddScoped<ICustomerSupportService, CustomerSupportService>();
+builder.Services.AddScoped<IPvaMakeService, PvaMakeService>();
+builder.Services.AddScoped<IPvaModelService, PvaModelService>();
+builder.Services.AddScoped<IPvaYearOfRegService, PvaYearOfRegService>();
+builder.Services.AddScoped<IPvaVariantService, PvaVariantService>();
+builder.Services.AddScoped<IPvaMakeService, PvaMakeService>();
 
 var app = builder.Build();
 

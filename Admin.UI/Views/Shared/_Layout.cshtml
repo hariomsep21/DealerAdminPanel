@@ -33,6 +33,26 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Car" asp-action="CarIndex">Car</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="CustomerSupport" asp-action="CustomerIndex">CustomerSupport</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <!-- Add 'dropdown' class to create a dropdown item -->
+                            <a class="nav-link text-dark dropdown-toggle" href="#" id="carDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Purchase Vehicle
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="carDropdown">
+                                <a class="dropdown-item" asp-area="" asp-controller="PvaAggregator" asp-action="AggregatorIndex">Aggregator</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="PvaNewCarMarket" asp-action="NewCarIndex">NewCar</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="PvaOpenMarket" asp-action="OpenMarketIndex">Open Market</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Model" asp-action="ModelIndex">Model</a>
+                                 <a class="dropdown-item" asp-area="" asp-controller="Make" asp-action="MakeIndex">Make</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Variant" asp-action="VariantIndex">Variants</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="YearOfReg" asp-action="YearIndex">Year</a>
+
+                                <!-- Add more dropdown items as needed -->
+                            </div>
+                        </li>
                     </ul>
                 </div>
             </div>
