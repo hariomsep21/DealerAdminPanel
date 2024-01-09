@@ -25,10 +25,56 @@ namespace Admin.UI.Controllers
             return View();
         }
 
+        public IActionResult LoginIndex()
+        {
+
+            return View();
+        }
+
         public async Task<ActionResult> AdminCreate()
         {
             return View();
         }
+
+        [HttpPost]
+        public async Task<ActionResult> AdminLoginAsync(AdminDto model)
+        {
+            try
+            {
+                // Check if the username exists
+                var existingAdmin = await _adminService.GetAdminDetailsAsync();
+
+                if (existingAdmin != null)
+                {
+                    // Username exists, try to log in
+                    var result = await _adminService.LoginAdmin(model);
+
+                    if (result != null)
+                    {
+                        TempData["successMessage"] = "Admin login successful.";
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        TempData["dangerMessage"] = "Admin login failed. Please try again.";
+                    }
+                }
+                else
+                {
+                    TempData["dangerMessage"] = "Admin with this username does not exist.";
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log or handle exceptions as needed
+                TempData["dangerMessage"] = "An error occurred while processing your request. Please try again.";
+            }
+
+            // If ModelState is not valid or the login fails, return to the view
+            return View("Index", model);
+        }
+
+
 
         [HttpPost]
         public async Task<ActionResult> AdminCreateAsync(AdminDto model)
