@@ -1,5 +1,7 @@
 ﻿using Admin.UI.Models;
 using Admin.UI.Service.IService;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -18,9 +20,14 @@ namespace Admin.UI.Controllers
 
         public async Task<ActionResult> CarIndex()
         {
+
+
             try
             {
+
+
                 var result = await _carService.GetCarDetailsAsync();
+
 
                 if (result != null)
                 {
@@ -30,27 +37,28 @@ namespace Admin.UI.Controllers
                     var states = await _userInfoService.GetUserDetailsAsync();
                     ViewBag.States = states ?? new List<UserInfoDto>(); // Null check
                     ViewBag.StatesCount = result.Count();
-                    TempData["successMessage"] = "Car Profile Update successful.";
+                    TempData["successMessage"] = "Admin login successful.";
+                    // Handle the case where result is null, e.g., return an empty view or show an error message
+                    TempData["UpdateCar"] = "Car Profile Update successful.";
                     return View(result);
-                    
+
                 }
 
-                // Handle the case where result is null, e.g., return an empty view or show an error message
-                TempData["successMessage"] = "Car Profile Update successful.";
+
                 return View(new List<UserInfoDto>());
-               
+
             }
-            catch (HttpRequestException ex)
-            {
-                // Log the exception details
-                Console.WriteLine($"HTTP request error: {ex.Message}");
-                throw; // rethrow the exception to propagate it up the call stack
-            }
+
             catch (Exception ex)
             {
                 // Log the exception details
                 Console.WriteLine($"Exception: {ex.Message}");
-                throw; // rethrow the exception to propagate it up the call stack
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Redirect to the login page or any other page as needed
+
+                //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+                return RedirectToAction("LoginIndex", "Home");// rethrow the exception to propagate it up the call stack
             }
 
         }
@@ -59,7 +67,7 @@ namespace Admin.UI.Controllers
         {
             try
             {
-                
+
                 var users = await _userInfoService.GetUserDetailsAsync(); // Fetch all users from your service
 
                 var userList = users.Select(u => new SelectListItem
@@ -76,12 +84,16 @@ namespace Admin.UI.Controllers
             {
                 // Log the exception or handle it as appropriate for your application
                 ModelState.AddModelError(string.Empty, "Internal Server Error");
-                return RedirectToAction(nameof(CarIndex));
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Redirect to the login page or any other page as needed
+
+                //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+                return RedirectToAction("LoginIndex", "Home");
             }
+
         }
-
         [HttpPost]
-
         public async Task<ActionResult> CarCreate(CarDto model)
         {
             if (ModelState.IsValid)
@@ -90,13 +102,14 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Car Create successful.";
+
                     return RedirectToAction(nameof(CarIndex));
+
                 }
             }
-
             return View(model);
         }
-
 
 
         public async Task<ActionResult> CarDelete(int carId)
@@ -163,9 +176,13 @@ namespace Admin.UI.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception or handle it as appropriate for your application
-                ModelState.AddModelError(string.Empty, "Internal Server Error");
-                return RedirectToAction(nameof(CarIndex));
+
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Redirect to the login page or any other page as needed
+
+                //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+                return RedirectToAction("LoginIndex", "Home");
             }
         }
 
@@ -201,8 +218,14 @@ namespace Admin.UI.Controllers
             {
                 // Log the exception or handle it as appropriate for your application
                 ModelState.AddModelError(string.Empty, "Internal Server Error");
-                return View("UpdateCar", updatedCarDto);
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Redirect to the login page or any other page as needed
+
+                //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+                return RedirectToAction("LoginIndex", "Home");
             }
         }
     }
 }
+

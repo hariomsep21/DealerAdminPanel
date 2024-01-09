@@ -23,9 +23,9 @@ namespace AdminService.Controllers
             _adminService = adminService;
         }
 
-       
 
-        [HttpGet("register")]
+
+        [HttpGet("RegisteredAdmin")]
         public async Task<ActionResult<IEnumerable<AdminDto>>> GetCarDetails()
         {
             try

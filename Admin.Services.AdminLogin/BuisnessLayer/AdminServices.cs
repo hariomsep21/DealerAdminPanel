@@ -11,7 +11,7 @@ using AutoMapper;
 
 namespace AdminService.BuisnessLayer
 {
-    public class AdminServices:IAdminServices
+    public class AdminServices : IAdminServices
     {
 
         private readonly IMapper _mapper;
@@ -110,7 +110,7 @@ namespace AdminService.BuisnessLayer
             }
         }
 
-            private string CreateToken(AdminTable admininfo)
+        private string CreateToken(AdminTable admininfo)
         {
             List<Claim> claims = new List<Claim>()
             {
@@ -120,7 +120,12 @@ namespace AdminService.BuisnessLayer
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config.GetSection("AppSettings:Token").Value));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
+            var Audience = _config.GetSection("AppSettings:audience").Value;
+            var Issuer = _config.GetSection("AppSettings:Issuer").Value;
             var token = new JwtSecurityToken(
+                audience: Audience,
+                issuer: Issuer,
+
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(30),
                 signingCredentials: creds

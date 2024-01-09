@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Admin.Services.StateAPI.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
+    [Authorize]
     public class StateAPIController : ControllerBase
     {
         private readonly IStateService _stateService;

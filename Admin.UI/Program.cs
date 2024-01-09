@@ -1,6 +1,7 @@
 using Admin.UI.Service;
 using Admin.UI.Service.IService;
 using Admin.UI.Utility;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient();
-builder.Services.AddHttpClient<IUserInfoService,UserInfoService>();
+builder.Services.AddHttpClient<IUserInfoService, UserInfoService>();
 ApiTypeSD.UserInfoAPIBase = builder.Configuration["ServicerUrls:UserinfoAPIBase"];
 ApiTypeSD.StateAPIBase = builder.Configuration["ServicerUrls:StateAPI"];
 
@@ -27,6 +28,20 @@ builder.Services.AddScoped<IPvaYearOfRegService, PvaYearOfRegService>();
 builder.Services.AddScoped<IPvaVariantService, PvaVariantService>();
 builder.Services.AddScoped<IPvaMakeService, PvaMakeService>();
 
+
+
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.ExpireTimeSpan = TimeSpan.FromHours(10);
+        options.LoginPath = "/Home/LoginIndex";
+
+    }
+
+    );
+
+builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -42,10 +57,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=LoginIndex}/{id?}");
 
 app.Run();

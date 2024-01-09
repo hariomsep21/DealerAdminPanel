@@ -1,5 +1,6 @@
 ﻿using Admin.Services.UserinfoAPI.BusinessLayer.IService;
 using Admin.Services.UserinfoAPI.Models.DTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace Admin.Services.UserinfoAPI.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
+    [Authorize]
     public class UserInfoAPIController : ControllerBase
     {
         private readonly IUserService _userService;

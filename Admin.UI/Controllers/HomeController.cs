@@ -1,9 +1,15 @@
 using Admin.UI.Models;
 using Admin.UI.Service;
 using Admin.UI.Service.IService;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Build.Framework;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Drawing.Text;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Admin.UI.Controllers
@@ -12,20 +18,16 @@ namespace Admin.UI.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IAdminService _adminService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public HomeController(ILogger<HomeController> logger, IAdminService adminService)
+        public HomeController(ILogger<HomeController> logger, IAdminService adminService, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _adminService = adminService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public IActionResult Index()
-        {
-            
-            return View();
-        }
-
-        public IActionResult LoginIndex()
         {
 
             return View();
@@ -36,32 +38,29 @@ namespace Admin.UI.Controllers
             return View();
         }
 
+        public async Task<ActionResult> LoginIndex()
+        {
+            return View();
+        }
         [HttpPost]
+
         public async Task<ActionResult> AdminLoginAsync(AdminDto model)
         {
             try
             {
-                // Check if the username exists
-                var existingAdmin = await _adminService.GetAdminDetailsAsync();
+                var (admin, token) = await _adminService.LoginAdmin(model);
 
-                if (existingAdmin != null)
+                if (admin != null && !string.IsNullOrEmpty(token))
                 {
-                    // Username exists, try to log in
-                    var result = await _adminService.LoginAdmin(model);
+                    // Sign in the user using the obtained token
+                    await SignInAsync(token);
 
-                    if (result != null)
-                    {
-                        TempData["successMessage"] = "Admin login successful.";
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        TempData["dangerMessage"] = "Admin login failed. Please try again.";
-                    }
+                    TempData["successMessage"] = "Admin login successful.";
+                    return RedirectToAction("CarIndex", "Car");
                 }
                 else
                 {
-                    TempData["dangerMessage"] = "Admin with this username does not exist.";
+                    TempData["dangerMessage"] = "Admin login failed. Please try again.";
                 }
             }
             catch (Exception ex)
@@ -71,10 +70,14 @@ namespace Admin.UI.Controllers
             }
 
             // If ModelState is not valid or the login fails, return to the view
-            return View("Index", model);
+            return View("LoginIndex", model);
         }
 
 
+        private string GenerateSessionToken()
+        {
+            return Guid.NewGuid().ToString();
+        }
 
         [HttpPost]
         public async Task<ActionResult> AdminCreateAsync(AdminDto model)
@@ -99,7 +102,7 @@ namespace Admin.UI.Controllers
             }
             else
             {
-               // ModelState.AddModelError("UserName", "Admin with this username already exists.");
+                // ModelState.AddModelError("UserName", "Admin with this username already exists.");
                 TempData["dangerMessage"] = "Admin registration failed. Please try again.";
                 return View("Index", model);
             }
@@ -110,11 +113,42 @@ namespace Admin.UI.Controllers
 
 
 
-
-        public IActionResult Privacy()
+        public async Task<ActionResult> Logout()
         {
-            return View();
+            // Expire the token cookie
+            _httpContextAccessor.HttpContext.Response.Cookies.Delete("Token");
+
+            // Sign out the user from the authentication system
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Redirect to the login page or any other page as needed
+            return RedirectToAction(nameof(LoginIndex));
         }
+
+        private async Task SignInAsync(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jwt = handler.ReadJwtToken(token);
+
+            var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Check if the JWT token contains a claim for the 'Name' attribute
+            var nameClaim = jwt.Claims.FirstOrDefault(claim => claim.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name");
+            if (nameClaim != null)
+            {
+                identity.AddClaim(new Claim(nameClaim.Type, nameClaim.Value));
+            }
+            else
+            {
+                // If 'Name' claim is missing, provide a default value or handle as needed
+                identity.AddClaim(new Claim(JwtRegisteredClaimNames.Name, "Unknown"));
+            }
+
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+        }
+
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

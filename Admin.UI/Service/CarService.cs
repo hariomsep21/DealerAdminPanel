@@ -3,16 +3,19 @@ using Admin.UI.Service.IService;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net;
+using System.Net.Http.Headers;
+
 
 namespace Admin.UI.Service
 {
     public class CarService : ICarService
     {
         private readonly HttpClient _httpClient;
-
-        public CarService(HttpClient httpClient)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public CarService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -20,6 +23,16 @@ namespace Admin.UI.Service
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.PostAsJsonAsync("https://localhost:7017/api/Car/AddCar", newCarDto);
 
                 response.EnsureSuccessStatusCode();
@@ -41,6 +54,17 @@ namespace Admin.UI.Service
         {
             try
             {
+
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.DeleteAsync($"https://localhost:7017/api/Car/Delete/{id}");
 
                 // Check if the response indicates a failure (non-success status code)
@@ -70,6 +94,7 @@ namespace Admin.UI.Service
             catch (Exception ex)
             {
                 throw new Exception($"Exception: {ex.Message}");
+
             }
         }
 
@@ -78,6 +103,14 @@ namespace Admin.UI.Service
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7017/api/Car/GetCarById{id}");
 
                 response.EnsureSuccessStatusCode();
@@ -99,13 +132,25 @@ namespace Admin.UI.Service
         {
             try
             {
+                // Get the token from the session
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
                 HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:7017/api/Car/GetAllCar");
 
                 if (response.IsSuccessStatusCode)
                 {
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    // Use JsonConvert.DeserializeObject directly without try-catch for simplicity
+                    // Deserialize the response body to CarDto objects
                     return JsonConvert.DeserializeObject<List<CarDto>>(responseBody) ?? new List<CarDto>();
                 }
                 else
@@ -123,10 +168,20 @@ namespace Admin.UI.Service
             }
         }
 
+
         public async Task<CarDto> UpdateCarAsync(int id, CarDto carDto)
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
                 HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"https://localhost:7017/api/Car/Update{id}", carDto);
 
                 response.EnsureSuccessStatusCode();

@@ -1,5 +1,7 @@
 ﻿using Admin.UI.Models;
 using Admin.UI.Service.IService;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -23,7 +25,7 @@ public class UserInfoController : Controller
             if (result != null)
             {
                 // Assuming you have a method to get the states, replace it with your actual logic
-           
+
 
                 var states = await _stateService.GetStateDetailsAsync();
                 ViewBag.States = states ?? new List<StateDto>(); // Null check
@@ -37,14 +39,23 @@ public class UserInfoController : Controller
         catch (HttpRequestException ex)
         {
             // Log the exception details
-            Console.WriteLine($"HTTP request error: {ex.Message}");
-            throw; // rethrow the exception to propagate it up the call stack
+            Console.WriteLine($"HTTP request error: {ex.Message}"); await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Redirect to the login page or any other page as needed
+
+            //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+            return RedirectToAction("LoginIndex", "Home"); throw; // rethrow the exception to propagate it up the call stack
         }
         catch (Exception ex)
         {
             // Log the exception details
             Console.WriteLine($"Exception: {ex.Message}");
-            throw; // rethrow the exception to propagate it up the call stack
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Redirect to the login page or any other page as needed
+
+            //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+            return RedirectToAction("LoginIndex", "Home");
         }
 
     }
@@ -114,7 +125,12 @@ public class UserInfoController : Controller
         {
             // Log the exception or handle it as appropriate for your application
             ModelState.AddModelError(string.Empty, "Internal Server Error");
-            return RedirectToAction(nameof(UserInfoIndex));
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Redirect to the login page or any other page as needed
+
+            //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+            return RedirectToAction("LoginIndex", "Home");
         }
     }
 
@@ -149,7 +165,12 @@ public class UserInfoController : Controller
         {
             // Log the exception or handle it as appropriate for your application
             ModelState.AddModelError(string.Empty, "Internal Server Error");
-            return View("UserUpdate", updatedUserDto);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            // Redirect to the login page or any other page as needed
+
+            //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+            return RedirectToAction("LoginIndex", "Home");
         }
     }
 
