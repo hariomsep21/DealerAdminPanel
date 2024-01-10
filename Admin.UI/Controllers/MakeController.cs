@@ -55,6 +55,7 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Make Created successful.";
                     return RedirectToAction(nameof(MakeIndex));
                 }
             }
@@ -69,12 +70,15 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Make Delete successful.";
                     return RedirectToAction(nameof(MakeIndex));
                 }
                 else
                 {
                     // Handle 404 Not Found
                     ModelState.AddModelError(string.Empty, "The requested state was not found.");
+                    TempData["dangerMessage"] = "Make Delete successful.";
+                    return RedirectToAction(nameof(MakeIndex));
                     return RedirectToAction(nameof(MakeIndex));
                 }
             }
@@ -117,12 +121,17 @@ namespace Admin.UI.Controllers
 
                     if (updatedState != null)
                     {
+                        TempData["successMessage"] = "Make Update successful.";
+                        
                         return RedirectToAction(nameof(MakeIndex));
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, $"State with ID {stateid} not found");
-                        return View("MakeUpdate", updatedMakeDto);
+
+                        TempData["dangerMessage"] = "Make Update Unsuccessful.";
+
+                        return RedirectToAction(nameof(MakeIndex));
                     }
                 }
 

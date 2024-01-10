@@ -2,6 +2,7 @@
 using Admin.UI.Service;
 using Admin.UI.Service.IService;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Admin.UI.Controllers
 {
@@ -86,12 +87,15 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Delete  Successful.";
+
                     return RedirectToAction(nameof(AggregatorIndex));
                 }
                 else
                 {
                     // Handle 404 Not Found
                     ModelState.AddModelError(string.Empty, "The requested state was not found.");
+                    TempData["dangerMessage"] = "Delete  Unsuccessful.";
                     return RedirectToAction(nameof(AggregatorIndex));
                 }
             }

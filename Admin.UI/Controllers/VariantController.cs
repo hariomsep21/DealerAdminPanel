@@ -55,6 +55,7 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Variant Created  Successfully.";
                     return RedirectToAction(nameof(VariantIndex));
                 }
             }
@@ -69,12 +70,14 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Variant Delete  Successfully.";
                     return RedirectToAction(nameof(VariantIndex));
                 }
                 else
                 {
                     // Handle 404 Not Found
                     ModelState.AddModelError(string.Empty, "The requested state was not found.");
+                    TempData["dangerMessage"] = "Variant Delete  Failed.";
                     return RedirectToAction(nameof(VariantIndex));
                 }
             }
@@ -117,12 +120,14 @@ namespace Admin.UI.Controllers
 
                     if (updatedState != null)
                     {
+                        TempData["successMessage"] = "Variant Updated  Successfully.";
                         return RedirectToAction(nameof(VariantIndex));
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, $"State with ID {stateid} not found");
-                        return View("VariantUpdate", updatedVariantDto);
+                        TempData["dangerMessage"] = "Variant Update  Failed.";
+                        return RedirectToAction(nameof(VariantIndex));
                     }
                 }
 

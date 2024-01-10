@@ -66,7 +66,7 @@ namespace Admin.UI.Controllers
                     // Sign in the user using the obtained token
                     await SignInAsync(token);
 
-                    TempData["successMessage"] = "Admin login successful.";
+                    TempData["AdminLoginMessage"] = "Admin login successful.";
                     return RedirectToAction("CarIndex", "Car");
                 }
                 else

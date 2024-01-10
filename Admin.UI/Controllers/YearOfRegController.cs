@@ -55,6 +55,7 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Year Created  Successfully.";
                     return RedirectToAction(nameof(YearIndex));
                 }
             }
@@ -69,12 +70,14 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Year Deleted  Successfully.";
                     return RedirectToAction(nameof(YearIndex));
                 }
                 else
                 {
                     // Handle 404 Not Found
                     ModelState.AddModelError(string.Empty, "The requested state was not found.");
+                    TempData["dangerMessage"] = "Year Deleted  Unsuccessfully.";
                     return RedirectToAction(nameof(YearIndex));
                 }
             }
@@ -117,11 +120,13 @@ namespace Admin.UI.Controllers
 
                     if (updatedState != null)
                     {
+                        TempData["successMessage"] = "Year Updated  Successfully.";
                         return RedirectToAction(nameof(YearIndex));
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, $"State with ID {stateid} not found");
+                        TempData["dangerMessage"] = "Year Updated  Unsuccessfully.";
                         return View("YearUpdate", updatedYearDto);
                     }
                 }

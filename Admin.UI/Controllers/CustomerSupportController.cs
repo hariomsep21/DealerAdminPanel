@@ -55,6 +55,7 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Customer Support Created  Successfully.";
                     return RedirectToAction(nameof(CustomerIndex));
                 }
             }
@@ -69,12 +70,14 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Customer Support Deleted Successfully.";
                     return RedirectToAction(nameof(CustomerIndex));
                 }
                 else
                 {
                     // Handle 404 Not Found
                     ModelState.AddModelError(string.Empty, "The requested state was not found.");
+                    TempData["dangerMessage"] = "Customer Support Delete  Unsuccessfully.";
                     return RedirectToAction(nameof(CustomerIndex));
                 }
             }
@@ -117,11 +120,13 @@ namespace Admin.UI.Controllers
 
                     if (updatedState != null)
                     {
+                        TempData["successMessage"] = "Customer Support Updated  Successfully.";
                         return RedirectToAction(nameof(CustomerIndex));
                     }
                     else
                     {
                         ModelState.AddModelError(string.Empty, $"State with ID {stateid} not found");
+                        TempData["dangerMessage"] = "Customer Support Update  Failed.";
                         return View("CustomerUpdate", updatedCustomerDto);
                     }
                 }
