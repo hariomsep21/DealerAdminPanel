@@ -67,6 +67,13 @@ namespace Admin.UI.Controllers
 
                     if (result != null)
                     {
+                        
+                    TempData["successMessage"] = "State Created successfully.";
+                        return RedirectToAction(nameof(StateIndex));
+                    }
+                    else
+                    {
+                        TempData["dangerMessage"] = "State Creation Failed.";
                         return RedirectToAction(nameof(StateIndex));
                     }
                 }
@@ -99,12 +106,13 @@ namespace Admin.UI.Controllers
 
                     if (result != null)
                     {
+                        TempData["successMessage"] = "State Deleted Successfully.";
                         return RedirectToAction(nameof(StateIndex));
                     }
                     else
                     {
                         // Handle 404 Not Found
-                        ModelState.AddModelError(string.Empty, "The requested state was not found.");
+                        TempData["dangerMessage"] = "State Deletion Failed.";
                         return RedirectToAction(nameof(StateIndex));
                     }
                 }
@@ -166,12 +174,13 @@ namespace Admin.UI.Controllers
 
                     if (updatedState != null)
                     {
+                        TempData["successMessage"] = "State Update Successfully.";
                         return RedirectToAction(nameof(StateIndex));
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, $"State with ID {stateid} not found");
-                        return View("StateUpdate", updatedStateDto);
+                        TempData["dangerMessage"] = "State Update Failed.";
+                        return RedirectToAction(nameof(StateIndex));
                     }
                 }
 

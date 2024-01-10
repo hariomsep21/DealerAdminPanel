@@ -51,12 +51,14 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
+                    TempData["successMessage"] = "Delete  Successful.";
                     return RedirectToAction(nameof(NewCarIndex));
                 }
                 else
                 {
                     // Handle 404 Not Found
                     ModelState.AddModelError(string.Empty, "The requested state was not found.");
+                    TempData["dangerMessage"] = "Delete  Unsuccessful.";
                     return RedirectToAction(nameof(NewCarIndex));
                 }
             }

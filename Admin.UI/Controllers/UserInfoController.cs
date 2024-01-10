@@ -67,15 +67,15 @@ public class UserInfoController : Controller
             var result = await _userInfoService.DeleteUserAsync(userid);
 
             if (result != null)
-            {
-                return RedirectToAction(nameof(UserInfoIndex));
-            }
-            else
-            {
-                // Handle 404 Not Found
-                ModelState.AddModelError(string.Empty, "The requested state was not found.");
-                return RedirectToAction(nameof(UserInfoIndex));
-            }
+           {
+                    TempData["successMessage"] = "User Delete successful.";
+                    return RedirectToAction(nameof(UserInfoIndex));
+                }
+                else
+                {
+                    TempData["dangerMessage"] = "failed . Please try again.";
+                    return RedirectToAction(nameof(UserInfoIndex));
+                }
         }
         return NotFound();
     }
@@ -150,11 +150,13 @@ public class UserInfoController : Controller
 
                 if (updatedState != null)
                 {
+                    TempData["successMessage"] = "User Update successfully.";
                     return RedirectToAction(nameof(UserInfoIndex));
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, $"User with ID {userid} not found");
+                    TempData["dangerMessage"] = "User Update Failed.";
                     return View("UserUpdate", updatedUserDto);
                 }
             }

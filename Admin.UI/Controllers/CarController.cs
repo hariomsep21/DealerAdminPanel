@@ -20,15 +20,20 @@ namespace Admin.UI.Controllers
 
         public async Task<ActionResult> CarIndex()
         {
-
+            //TempData["CarSuccessMessage"] = "Admin login successful.";
 
             try
             {
+                
+                        
 
 
                 var result = await _carService.GetCarDetailsAsync();
 
-
+                if (TempData.ContainsKey("AdminLoginMessage"))
+                {
+                    ViewBag.AdminLoginMessage = TempData["AdminLoginMessage"];
+                }
                 if (result != null)
                 {
                     // Assuming you have a method to get the states, replace it with your actual logic
@@ -37,9 +42,9 @@ namespace Admin.UI.Controllers
                     var states = await _userInfoService.GetUserDetailsAsync();
                     ViewBag.States = states ?? new List<UserInfoDto>(); // Null check
                     ViewBag.StatesCount = result.Count();
-                    TempData["successMessage"] = "Admin login successful.";
+                  
                     // Handle the case where result is null, e.g., return an empty view or show an error message
-                    TempData["UpdateCar"] = "Car Profile Update successful.";
+                    
                     return View(result);
 
                 }
@@ -102,8 +107,8 @@ namespace Admin.UI.Controllers
 
                 if (result != null)
                 {
-                    TempData["successMessage"] = "Car Create successful.";
 
+                    TempData["CarCreateMessage"] = "Car Create successful.";
                     return RedirectToAction(nameof(CarIndex));
 
                 }
@@ -203,6 +208,7 @@ namespace Admin.UI.Controllers
 
                     if (updatedState != null)
                     {
+                        TempData["UpdateCar"] = "Car Profile Update successful.";
                         return RedirectToAction(nameof(CarIndex));
                     }
                     else
@@ -211,7 +217,6 @@ namespace Admin.UI.Controllers
                         return View("UpdateCar", updatedCarDto);
                     }
                 }
-
                 return View("UpdateCar", updatedCarDto);
             }
             catch (Exception ex)

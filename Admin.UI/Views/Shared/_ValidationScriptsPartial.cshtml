@@ -6,7 +6,15 @@
         if ("@TempData["successMessage"]" !== "") {
             showToast("alert-success", "@TempData["successMessage"]");
         }
-
+        if ("@TempData["UpdateCar"]" !== "") {
+            showToast("alert-success", "@TempData["UpdateCar"]");
+        }
+        if ("@TempData["AdminLoginMessage"]" !== "") {
+            showToast("alert-success", "@TempData["AdminLoginMessage"]");
+        }
+        if ("@TempData["CarCreateMessage"]" !== "") {
+            showToast("alert-success", "@TempData["CarCreateMessage"]");
+        }
         // Show error toast message
         if ("@TempData["dangerMessage"]" !== "") {
             showToast("alert-danger", "@TempData["dangerMessage"]");
