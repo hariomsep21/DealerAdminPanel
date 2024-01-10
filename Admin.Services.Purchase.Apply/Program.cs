@@ -1,6 +1,9 @@
 using Admin.Services.Purchase.Apply.BusinessLayer.IServices;
 using Admin.Services.Purchase.Apply.BusinessLayer.Services;
 using Admin.Services.Purchase.Apply.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +27,26 @@ builder.Services.AddDbContext<DealerApifinalContext>();
 
 // AutoMapper Config
 builder.Services.AddAutoMapper(typeof(Program));
+var SettingSection = builder.Configuration.GetSection("AppSettings");
+var Issuer = SettingSection.GetValue<string>("Issuer");
+var audience = SettingSection.GetValue<string>("audience");
+var secret = SettingSection.GetValue<string>("Token");
+var key = Encoding.UTF8.GetBytes(secret);
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = true,
+        ValidIssuer = Issuer,
+        ValidateAudience = true,
+        ValidAudience = audience
 
+
+    };
+});
+builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -35,7 +57,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

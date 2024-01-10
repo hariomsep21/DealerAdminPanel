@@ -2,23 +2,36 @@
 using Admin.UI.Service.IService;
 using Newtonsoft.Json;
 using System.Net;
+using System.Net.Http.Headers;
 
 namespace Admin.UI.Service
 {
     public class AggregatorsService : IAggregatorsService
     {
         private readonly HttpClient _httpClient;
-
-        public AggregatorsService(HttpClient httpClient)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AggregatorsService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
-        
-            _httpClient = httpClient;
 
+            _httpClient = httpClient;
+            _httpContextAccessor = httpContextAccessor;
         }
-            public async Task<PvAggregatorsDto> DeleteAggregatorAsync(int id)
+         public async Task<PvAggregatorsDto> DeleteAggregatorAsync(int id)
         {
             try
             {
+                // Get the token from the session
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
                 HttpResponseMessage response = await _httpClient.DeleteAsync($"https://localhost:7024/api/PvAggregatorsAPI/Delete/{id}");
 
                 // Check if the response indicates a failure (non-success status code)
@@ -53,6 +66,18 @@ namespace Admin.UI.Service
         {
             try
             {
+                // Get the token from the session
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
                 HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7024/api/PvAggregatorsAPI/GetAggregatorById/{id}");
 
                 response.EnsureSuccessStatusCode();
@@ -74,6 +99,18 @@ namespace Admin.UI.Service
         {
             try
             {
+                // Get the token from the session
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
                 HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:7024/api/PvAggregatorsAPI/GetAllAggregators");
 
                 response.EnsureSuccessStatusCode();

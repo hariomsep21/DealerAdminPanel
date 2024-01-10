@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Drawing.Text;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace Admin.UI.Controllers
@@ -29,6 +30,11 @@ namespace Admin.UI.Controllers
 
         public IActionResult Index()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("CarIndex", "Car"); // Redirect authenticated users to a different page
+            }
+
 
             return View();
         }
@@ -40,6 +46,11 @@ namespace Admin.UI.Controllers
 
         public async Task<ActionResult> LoginIndex()
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("CarIndex", "Car"); // Redirect authenticated users to a different page
+            }
+
             return View();
         }
         [HttpPost]
