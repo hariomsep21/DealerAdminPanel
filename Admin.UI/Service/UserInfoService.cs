@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Admin.UI.Service
@@ -13,16 +14,27 @@ namespace Admin.UI.Service
     public class UserInfoService : IUserInfoService
     {
         private readonly HttpClient _httpClient;
-
-        public UserInfoService(HttpClient httpClient)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public UserInfoService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<UserInfoDto> DeleteUserAsync(int id)
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.DeleteAsync($"https://localhost:7046/api/UserInfoAPI/Delete/{id}");
 
                 // Check if the response indicates a failure (non-success status code)
@@ -53,10 +65,21 @@ namespace Admin.UI.Service
             }
         }
 
-        public  async Task<UserInfoDto> GetUserByIdAsync(int id)
+        public async Task<UserInfoDto> GetUserByIdAsync(int id)
         {
             try
             {
+
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7046/api/UserInfoAPI/GetUserById{id}");
 
                 response.EnsureSuccessStatusCode();
@@ -78,6 +101,17 @@ namespace Admin.UI.Service
         {
             try
             {
+
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:7046/api/UserInfoAPI/Getdetails");
 
                 if (response.IsSuccessStatusCode)
@@ -106,6 +140,17 @@ namespace Admin.UI.Service
         {
             try
             {
+
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"https://localhost:7046/api/UserInfoAPI/UpdateId{id}", updatedStateDto);
 
                 response.EnsureSuccessStatusCode();
@@ -129,58 +174,4 @@ namespace Admin.UI.Service
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        //public async Task<IEnumerable<UserInfoDto>> GetUserDetailsAsync()
-        //{
-        //    var response = await _baseService.SendAsync(new RequestDto
-        //    {
-        //        ApiType = ApiTypeSD.ApiType.GET,
-        //        Url = ApiTypeSD.UserInfoAPIBase + "/api/UserInfoAPI/Getdetails"
-        //    });
-
-        //    try
-        //    {
-        //        if (response != null && response.Result != null)
-        //        {
-        //            var result = JsonConvert.DeserializeObject<List<UserInfoDto>>(response.Result.ToString());
-        //            return result ?? new List<UserInfoDto>();
-        //        }
-        //        else
-        //        {
-        //            // Log a message or handle the case where response or response.Result is null
-        //            // You may return an empty list or throw an exception based on your application logic
-        //            return new List<UserInfoDto>();
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log the exception or handle it as appropriate for your application
-        //        // You may want to log the exception and return an error view
-        //        return new List<UserInfoDto>();
-        //    }
-        //}
 

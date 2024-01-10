@@ -1,6 +1,8 @@
 ﻿using Admin.UI.Models;
 using Admin.UI.Service;
 using Admin.UI.Service.IService;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Reflection;
@@ -13,7 +15,7 @@ namespace Admin.UI.Controllers
 
         public StateController(IStateService stateService)
         {
-           _stateService = stateService;
+            _stateService = stateService;
         }
 
         public async Task<ActionResult> StateIndex()
@@ -40,7 +42,12 @@ namespace Admin.UI.Controllers
             {
                 // Log the exception details
                 Console.WriteLine($"Exception: {ex.Message}");
-                throw; // rethrow the exception to propagate it up the call stack
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Redirect to the login page or any other page as needed
+
+                //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+                return RedirectToAction("LoginIndex", "Home");
             }
         }
 
@@ -52,36 +59,70 @@ namespace Admin.UI.Controllers
         [HttpPost]
         public async Task<ActionResult> StateCreate(StateDto model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var result = await _stateService.AddStateAsync(model);
-
-                if (result != null)
+                if (ModelState.IsValid)
                 {
-                    return RedirectToAction(nameof(StateIndex));
+                    var result = await _stateService.AddStateAsync(model);
+
+                    if (result != null)
+                    {
+                        return RedirectToAction(nameof(StateIndex));
+                    }
                 }
+                // If the model state is invalid or the state creation fails, return the view with the model
+                return View(model);
             }
-            return View(model);
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                ModelState.AddModelError(string.Empty, "An error occurred while processing your request. Please try again.");
+
+                // Return the view with the model and the error message
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Redirect to the login page or any other page as needed
+
+                //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+                return RedirectToAction("LoginIndex", "Home");
+            }
         }
+
 
         public async Task<ActionResult> StateDelete(int stateid)
         {
-            if (ModelState.IsValid)
+            try
             {
-                var result = await _stateService.DeleteStateAsync(stateid);
+                if (ModelState.IsValid)
+                {
+                    var result = await _stateService.DeleteStateAsync(stateid);
 
-                if (result != null)
-                {
-                    return RedirectToAction(nameof(StateIndex));
+                    if (result != null)
+                    {
+                        return RedirectToAction(nameof(StateIndex));
+                    }
+                    else
+                    {
+                        // Handle 404 Not Found
+                        ModelState.AddModelError(string.Empty, "The requested state was not found.");
+                        return RedirectToAction(nameof(StateIndex));
+                    }
                 }
-                else
-                {
-                    // Handle 404 Not Found
-                    ModelState.AddModelError(string.Empty, "The requested state was not found.");
-                    return RedirectToAction(nameof(StateIndex));
-                }
+                return NotFound(); // If ModelState is not valid
             }
-            return NotFound();
+            catch (Exception ex)
+            {
+                // Log the exception or handle it as appropriate for your application
+                ModelState.AddModelError(string.Empty, "An error occurred while processing your request. Please try again.");
+
+                // Return the view or appropriate action after catching the exception
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Redirect to the login page or any other page as needed
+
+                //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+                return RedirectToAction("LoginIndex", "Home");
+            }
         }
 
         public async Task<ActionResult> StateToUpdate(int stateid)
@@ -104,7 +145,12 @@ namespace Admin.UI.Controllers
             {
                 // Log the exception or handle it as appropriate for your application
                 ModelState.AddModelError(string.Empty, "Internal Server Error");
-                return RedirectToAction(nameof(StateIndex));
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Redirect to the login page or any other page as needed
+
+                //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+                return RedirectToAction("LoginIndex", "Home");
             }
         }
 
@@ -112,7 +158,7 @@ namespace Admin.UI.Controllers
         public async Task<ActionResult> StateUpdate([FromRoute] int stateid, [FromForm] StateDto updatedStateDto)
         {
             try
-            { 
+            {
                 if (ModelState.IsValid)
                 {
                     stateid = updatedStateDto.StateId;
@@ -135,10 +181,15 @@ namespace Admin.UI.Controllers
             {
                 // Log the exception or handle it as appropriate for your application
                 ModelState.AddModelError(string.Empty, "Internal Server Error");
-                return View("StateUpdate", updatedStateDto);
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+                // Redirect to the login page or any other page as needed
+
+                //     ModelState.AddModelError(string.Empty, "Internal Server Error");
+                return RedirectToAction("LoginIndex", "Home");
             }
+
+
         }
-
-
     }
 }

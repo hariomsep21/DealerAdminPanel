@@ -1,5 +1,6 @@
 using AdminService.BuisnessLayer;
 using AdminService.DataLayer;
+using Jose;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,7 +18,7 @@ builder.Services.AddDbContext<DealerApifinalContext>(option =>
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IAdminServices, AdminServices>();
 // Add services to the container.
-
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -32,18 +33,7 @@ builder.Services.AddSwaggerGen(
         });
         options.OperationFilter<SecurityRequirementsOperationFilter>();
     });
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
-        ValidateIssuer = false,
-        ValidateAudience = true,
-        ValidAudience = "http://localhost:5169"
 
-    };
-});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -54,7 +44,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

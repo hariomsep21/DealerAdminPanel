@@ -7,7 +7,7 @@ namespace Admin.UI.Service.IService
     {
         Task<IEnumerable<AdminDto>> GetAdminDetailsAsync();
         Task<AdminDto> RegisterAdmin(AdminDto adminDTO);
-        Task<AdminDto> LoginAdmin(AdminDto adminDTO);
+        Task<(AdminDto, string)> LoginAdmin(AdminDto adminDTO);
 
 
     }

@@ -1,10 +1,12 @@
 ﻿using Admin.Services.CarService.BuisnessLayer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarService.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
+    [Authorize]
     public class CarController : ControllerBase
     {
 
