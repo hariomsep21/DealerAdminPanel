@@ -2,23 +2,34 @@
 using Admin.UI.Service.IService;
 using Newtonsoft.Json;
 using System.Net;
+using System.Net.Http.Headers;
 
 namespace Admin.UI.Service
 {
     public class CustomerSupportService : ICustomerSupportService
     {
         private readonly HttpClient _httpClient;
-
-        public CustomerSupportService(HttpClient httpClient)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public CustomerSupportService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
 
             _httpClient = httpClient;
-
+            _httpContextAccessor = httpContextAccessor;
         }
         public async Task<CustomerSupportDto> AddCrustSptAsync(CustomerSupportDto newStateDto)
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.PostAsJsonAsync("https://localhost:7192/api/CustomerSupportAPI/AddState", newStateDto);
 
                 response.EnsureSuccessStatusCode();
@@ -40,6 +51,16 @@ namespace Admin.UI.Service
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.DeleteAsync($"https://localhost:7192/api/CustomerSupportAPI/Delete/{id}");
 
                 // Check if the response indicates a failure (non-success status code)
@@ -74,6 +95,16 @@ namespace Admin.UI.Service
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7192/api/CustomerSupportAPI/GetStateById{id}");
 
                 response.EnsureSuccessStatusCode();
@@ -95,6 +126,16 @@ namespace Admin.UI.Service
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:7192/api/CustomerSupportAPI/GetAllState");
 
                 response.EnsureSuccessStatusCode();
@@ -116,6 +157,16 @@ namespace Admin.UI.Service
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"https://localhost:7192/api/CustomerSupportAPI/Update{id}", updatedStateDto);
 
                 response.EnsureSuccessStatusCode();

@@ -2,23 +2,35 @@
 using Admin.UI.Service.IService;
 using Newtonsoft.Json;
 using System.Net;
+using System.Net.Http.Headers;
 
 namespace Admin.UI.Service
 {
     public class PvaVariantService : IPvaVariantService
     {
         private readonly HttpClient _httpClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public PvaVariantService(HttpClient httpClient)
+        public PvaVariantService(HttpClient httpClient,IHttpContextAccessor httpContextAccessor)
         {
 
             _httpClient = httpClient;
-
+_httpContextAccessor = httpContextAccessor;
         }
         public async Task<PvaVariantDto> AddVariantAsync(PvaVariantDto newStateDto)
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.PostAsJsonAsync("https://localhost:7024/api/PvaVariantAPI/AddVariant", newStateDto);
 
                 response.EnsureSuccessStatusCode();
@@ -40,6 +52,16 @@ namespace Admin.UI.Service
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.DeleteAsync($"https://localhost:7024/api/PvaVariantAPI/Delete/{id}");
 
                 // Check if the response indicates a failure (non-success status code)
@@ -74,7 +96,17 @@ namespace Admin.UI.Service
         {
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7024/api/PvaVariantAPI/GetVariantById{id}");
+
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token); HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7024/api/PvaVariantAPI/GetVariantById{id}");
 
                 response.EnsureSuccessStatusCode();
 
@@ -95,6 +127,17 @@ namespace Admin.UI.Service
         {
             try
             {
+
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:7024/api/PvaVariantAPI/GetAllVariant");
 
                 response.EnsureSuccessStatusCode();
@@ -116,6 +159,16 @@ namespace Admin.UI.Service
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"https://localhost:7024/api/PvaVariantAPI/Update{id}", updatedStateDto);
 
                 response.EnsureSuccessStatusCode();

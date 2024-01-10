@@ -19,6 +19,7 @@ namespace Admin.UI.Service
         {
             try
             {
+
                 HttpResponseMessage response = await _httpClient.PostAsJsonAsync("https://localhost:7024/api/PvaModelAPI/AddModel", newStateDto);
 
                 response.EnsureSuccessStatusCode();

@@ -2,6 +2,7 @@
 using Admin.UI.Service.IService;
 using Newtonsoft.Json;
 using System.Net;
+using System.Net.Http.Headers;
 
 namespace Admin.UI.Service
 {
@@ -9,18 +10,28 @@ namespace Admin.UI.Service
     {
 
         private readonly HttpClient _httpClient;
-
-        public PvaYearOfRegService(HttpClient httpClient)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public PvaYearOfRegService(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
 
             _httpClient = httpClient;
-
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<PvaYearOfRegDto> AddYearAsync(PvaYearOfRegDto newStateDto)
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.PostAsJsonAsync("https://localhost:7024/api/PvaYearOfRegAPI/AddMake", newStateDto);
 
                 response.EnsureSuccessStatusCode();
@@ -42,6 +53,16 @@ namespace Admin.UI.Service
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.DeleteAsync($"https://localhost:7024/api/PvaYearOfRegAPI/Delete/{id}");
 
                 // Check if the response indicates a failure (non-success status code)
@@ -76,6 +97,17 @@ namespace Admin.UI.Service
         {
             try
             {
+
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:7024/api/PvaYearOfRegAPI/GetStateById{id}");
 
                 response.EnsureSuccessStatusCode();
@@ -97,6 +129,17 @@ namespace Admin.UI.Service
         {
             try
             {
+
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:7024/api/PvaYearOfRegAPI/GetAllYear");
 
                 response.EnsureSuccessStatusCode();
@@ -118,6 +161,16 @@ namespace Admin.UI.Service
         {
             try
             {
+                string token = _httpContextAccessor.HttpContext.Request.Cookies["Token"];
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    // Handle case where token is missing or not retrieved properly
+                    throw new Exception("Token not found or invalid.");
+                }
+
+                // Set up HttpClient with the token in the Authorization header
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"https://localhost:7024/api/PvaYearOfRegAPI/Update{id}", updatedStateDto);
 
                 response.EnsureSuccessStatusCode();
